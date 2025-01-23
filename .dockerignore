@@ -1,0 +1,17 @@
+.git/
+.idea/
+.gradle/
+gradle/wrapper/
+cmake-build-*/
+.idea_modules/
+kotlin-js-store/
+build/
+!build/install/
+*.iws
+atlassian-ide-plugin.xml
+*.log
+hs_err_pid*
+replay_pid*
+gradle-app.setting
+.project
+.classpath
