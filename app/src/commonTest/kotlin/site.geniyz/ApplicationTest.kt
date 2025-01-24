@@ -1,8 +1,8 @@
 package site.geniyz.ots
 
+import org.junit.Assert.assertThrows
 import kotlin.math.abs
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 class `Тестирование корректности решения квадратного уровнения` {
@@ -48,5 +48,12 @@ class `Тестирование корректности решения квад
         assert( abs(-.5-xs.first()) < epsilon )
     }
 
-    // Посмотреть какие еще значения могут принимать числа типа double, кроме числовых и написать тест с их использованием на все коэффициенты. solve должен выбрасывать исключение.
+    @Test
+    fun `N13 обработка не настоящих чисел`() {
+        Application.NotANumbers.forEach {
+            assertThrows(NumberIsNotANumber::class.java) { app.solve(a = it) }
+            assertThrows(NumberIsNotANumber::class.java) { app.solve(b = it) }
+            assertThrows(NumberIsNotANumber::class.java) { app.solve(c = it) }
+        }
+    }
 }
