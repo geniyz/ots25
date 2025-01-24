@@ -6,7 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class `Тестирование корректности решения квадратного уровнения` {
-    val epsilon: Double = 100000*Double.MIN_VALUE // Не самое маленькое эпсилон
+    val epsilon: Double = 100000*Application.Epsilon
 
     val app = Application(epsilon)
 
