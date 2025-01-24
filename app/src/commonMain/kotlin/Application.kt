@@ -9,9 +9,9 @@ class NumberIsNotANumber: Throwable("Число не является число
 class Application(
     val epsilon: Double = Double.MIN_VALUE,
 ){
-    init {
-        println("epsilon = $epsilon")
-    }
+    // init {
+    //     println("epsilon = $epsilon")
+    // }
     fun solve(a: Double = 0.0, b: Double = 0.0, c: Double = 0.0): List<Double>{
         return buildList {
 
@@ -21,7 +21,7 @@ class Application(
 
             val discriminant = (b*b)-(4*a*c) // D=b²−4ac
 
-            println("D = $discriminant")
+            // println("D = $discriminant")
 
             if( discriminant == abs(discriminant) /* >= 0 */ ){
                 if( discriminant > epsilon ){
