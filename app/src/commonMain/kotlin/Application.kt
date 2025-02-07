@@ -7,7 +7,7 @@ class AIsZeroError : Throwable()
 class NumberIsNotANumber: Throwable("Число не является числом")
 
 class Application(
-    val epsilon: Double = Double.MIN_VALUE,
+    val epsilon: Double = Epsilon,
 ){
     // init {
     //     println("epsilon = $epsilon")
@@ -39,5 +39,6 @@ class Application(
 
     companion object {
         val NotANumbers = listOf(Double.NaN, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY)
+        val Epsilon = .0000000000000000001
     }
 }
