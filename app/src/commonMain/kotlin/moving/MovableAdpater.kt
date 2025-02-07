@@ -7,7 +7,7 @@ import kotlin.math.sin
 
 class MovableAdpater(val o: UObject): Movable {
 
-    override var position: Vector?
+    override var position: Vector
         get()= o["position"] as Vector
         set(newPosition){
             o["Position"] = newPosition

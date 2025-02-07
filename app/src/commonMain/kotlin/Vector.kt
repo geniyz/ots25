@@ -15,4 +15,11 @@ class Vector(
         x = x * n,
         y = y * n,
     )
+
+    fun isNaN() = (x.isNaN() || y.isNaN()) ||
+            (x.isInfinite() || y.isInfinite())
+
+            companion object{
+        val NONE = Vector(Double.NaN, Double.NaN)
+    }
 }

@@ -18,7 +18,21 @@ class `Прямолинейное равномерное движение без
     }
 
     @Test(expected = Throwable::class)
-    fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке`(){
+    fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке — NaN`(){
         Move(Spaceship()).execute()
+    }
+
+    @Test(expected = Throwable::class)
+    fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке — ∞`(){
+        Move(Spaceship(position = Vector(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY))).execute()
+    }
+
+    @Test(expected = Throwable::class)
+    fun `Попытка сдвинуть объект, у которого невозможно прочитать значение мгновенной скорости, приводит к ошибке — NaN`(){
+        Move(Spaceship(position = Vector(0,0))).execute()
+    }
+    @Test(expected = Throwable::class)
+    fun `Попытка сдвинуть объект, у которого невозможно прочитать значение мгновенной скорости, приводит к ошибке — ∞`(){
+        Move(Spaceship(position = Vector(0,0), velocity = Vector(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY))).execute()
     }
 }

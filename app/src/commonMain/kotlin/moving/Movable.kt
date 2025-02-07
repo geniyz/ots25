@@ -4,5 +4,5 @@ import site.geniyz.ots.Vector
 
 interface Movable {
     val velocity: Vector
-    var position: Vector?
+    var position: Vector
 }
