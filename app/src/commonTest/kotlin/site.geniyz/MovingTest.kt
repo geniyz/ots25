@@ -1,5 +1,8 @@
 package site.geniyz.ots
 
+import site.geniyz.ots.moving.BadEndPosition
+import site.geniyz.ots.moving.BadStartPosition
+import site.geniyz.ots.moving.BadVelocity
 import site.geniyz.ots.moving.Move
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,22 +20,27 @@ class `Прямолинейное равномерное движение без
         assertEquals(ss.position?.y, 8.toDouble())
     }
 
-    @Test(expected = Throwable::class)
+    @Test(expected = BadStartPosition::class)
     fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке — NaN`(){
         Move(Spaceship()).execute()
     }
 
-    @Test(expected = Throwable::class)
+    @Test(expected = BadStartPosition::class)
     fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке — ∞`(){
         Move(Spaceship(position = Vector(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY))).execute()
     }
 
-    @Test(expected = Throwable::class)
+    @Test(expected = BadVelocity::class)
     fun `Попытка сдвинуть объект, у которого невозможно прочитать значение мгновенной скорости, приводит к ошибке — NaN`(){
         Move(Spaceship(position = Vector(0,0))).execute()
     }
-    @Test(expected = Throwable::class)
+    @Test(expected = BadVelocity::class)
     fun `Попытка сдвинуть объект, у которого невозможно прочитать значение мгновенной скорости, приводит к ошибке — ∞`(){
         Move(Spaceship(position = Vector(0,0), velocity = Vector(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY))).execute()
+    }
+
+    @Test(expected = BadEndPosition::class)
+    fun `Попытка сдвинуть объект, у которого невозможно изменить положение в пространстве, приводит к ошибке`(){
+        Move(Spaceship(position = Vector(Double.MAX_VALUE, Double.MIN_VALUE), velocity = Vector(Double.MAX_VALUE, Double.MAX_VALUE) )).execute()
     }
 }

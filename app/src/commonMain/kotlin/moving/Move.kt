@@ -1,14 +1,14 @@
 package site.geniyz.ots.moving
 
-import site.geniyz.ots.Vector
-
 class Move(
     val m: Movable
 ) {
     fun execute(){
-        if(m.position.isNaN()) error("Не корректны координаты, для совершения движения")
-        if(m.velocity.isNaN()) error("Не корректна скорость, для совершения движения")
+        if(m.position.isNaN()) throw BadStartPosition()
+        if(m.velocity.isNaN()) throw BadVelocity()
 
-        m.position += m.velocity
+        val newPos = m.position + m.velocity
+        if(newPos.isNaN()) throw BadEndPosition()
+        m.position = newPos
     }
 }
