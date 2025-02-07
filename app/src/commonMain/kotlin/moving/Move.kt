@@ -6,6 +6,8 @@ class Move(
     fun execute(){
         if(m.position != null) {
             m.position = m.position!! + m.velocity
+        }else{
+            error("Не известны координаты, для совершения движения")
         }
     }
 }

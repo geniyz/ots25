@@ -16,4 +16,9 @@ class `Прямолинейное равномерное движение без
         assertEquals(ss.position?.x, 5.toDouble())
         assertEquals(ss.position?.y, 8.toDouble())
     }
+
+    @Test(expected = Throwable::class)
+    fun `Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке`(){
+        Move(Spaceship()).execute()
+    }
 }
