@@ -1,13 +1,13 @@
 package site.geniyz.ots
 
-import site.geniyz.ots.moving.Movable
-import site.geniyz.ots.rotating.Rotable
-
 class Spaceship(
-    override val velocity: Vector = Vector.NONE,
-    override var position: Vector = Vector.NONE,
+    val params: MutableMap<String, Any?> = mutableMapOf(),
+) : UObject {
 
-    override val angularVelocity: Int = 0,
-    override var direction: Int = 0,
+    constructor(vararg params: Pair<String, Any?>) : this(params.toMap().toMutableMap())
 
-) : Movable, Rotable
+    override fun get(k: String): Any? = params[k]
+    override fun set(k: String, value: Any?){
+        params[k] = value
+    }
+}
