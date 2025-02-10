@@ -13,7 +13,7 @@ object ExceptionHandler {
     fun handle(
         command: Executable, // Команда
         exception: Throwable, // Ошибка
-        defaultHandler: (()->Unit)?, // дефолтный обработчик
+        defaultHandler: (()->Unit)? = null, // дефолтный обработчик
     ) {
         val cmdType = command.toString().substringBefore("@")
         val excType = exception.toString().substringBefore(":")

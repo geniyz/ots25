@@ -5,6 +5,7 @@ import site.geniyz.ots.commands.RepeatCommand
 import site.geniyz.ots.logger.WriteToLog
 import site.geniyz.ots.moving.*
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class `SOLID и исключения` {
     @Test
@@ -53,6 +54,29 @@ class `SOLID и исключения` {
                 println(ssOk)
             }
         }
+
+    }
+
+    @Test
+    fun `Тестирование повторителя`() {
+        val ssBroke = Spaceship(
+            "position" to Vector(0, 0),
+            "velocity" to Vector(Double.NaN, Double.NaN),
+        )
+        val commands = ArrayDeque<Executable>()
+        commands.add(Move(MovableAdpater(ssBroke))) // в очередь команд добавляется «плохая»
+
+        // регистрация повторителя:
+        ExceptionHandler.register(Move::class.toString(), BadVelocity::class.toString()) { c, e -> commands.addFirst( RepeatCommand(c) ) }
+
+        val command = commands.removeFirst()      // считывается первая (она же плохая, она же единственная) команда
+        try {                                     // Обернуть вызов Команды в блок try-catch.
+            command.execute()
+        }catch (e: Throwable){                    // Обработчик catch должен перехватывать только самое базовое исключение.
+            ExceptionHandler.handle( command, e ) // тут должен произойти вызов повторителя
+        }
+
+        assertEquals( "site.geniyz.ots.commands.RepeatCommand", commands.removeFirst().toString().substringBefore("@")) // убедиться, что в очереди команд появился повторитель
 
     }
 }
