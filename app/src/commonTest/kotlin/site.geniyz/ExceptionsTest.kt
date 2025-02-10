@@ -1,6 +1,7 @@
 package site.geniyz.ots
 
 import site.geniyz.ots.commands.Executable
+import site.geniyz.ots.commands.RepeatCommand
 import site.geniyz.ots.logger.WriteToLog
 import site.geniyz.ots.moving.*
 import kotlin.test.Test
@@ -27,6 +28,14 @@ class `SOLID и исключения` {
         commands.add(Move(MovableAdpater(ssOk)))
         commands.add(Move(MovableAdpater(ssOk)))
 
+        // ПРОШУ ПОДСКАЗАТЬ, КАК ЭТО ДЕЛАТЬ ПРАВИЛЬНО
+        // Я ДАЛЁК ОТ РЕФЛЕКСИИ
+        // ПОТОМУ ТУТ ИЗВРАЩАЮСЬ КАК МОГУ СО СТРОКАМИ
+        ExceptionHandler.register(Move::class.toString(), BadVelocity::class.toString()) { c, e -> // если при попытке движения падает на БэдВелосити,
+            commands.addFirst( RepeatCommand(c) )                                                  // то попробовать ещё раз
+            println("опп! → повтор")
+        }
+
         while(true){
             val command = commands.removeFirstOrNull()
             if(command == null){
@@ -35,9 +44,11 @@ class `SOLID и исключения` {
                 try {                          // Обернуть вызов Команды в блок try-catch.
                     command.execute()
                 }catch (e: Throwable){         // Обработчик catch должен перехватывать только самое базовое исключение.
-                    commands.addFirst(         // Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
-                        WriteToLog(command, e) // Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
-                    )
+                    ExceptionHandler.handle( command, e ) { // дефолтный обработчик: (ставит в очередь команду, которая пишет в лог)
+                        commands.addFirst(         // Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+                            WriteToLog(command,e)  // Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
+                        )
+                    }
                 }
                 println(ssOk)
             }
