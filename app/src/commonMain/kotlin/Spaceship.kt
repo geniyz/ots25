@@ -10,4 +10,6 @@ class Spaceship(
     override fun set(k: String, value: Any?){
         params[k] = value
     }
+
+    override fun toString()= params.map{ "${it.key} → ${it.value}" }.joinToString("; ")
 }
