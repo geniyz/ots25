@@ -1,9 +1,11 @@
 package site.geniyz.ots.moving
 
+import site.geniyz.ots.commands.Executable
+
 class Move(
     val m: Movable
-) {
-    fun execute(){
+): Executable {
+    override fun execute(){
         if(m.position.isNaN()) throw BadStartPosition()
         if(m.velocity.isNaN()) throw BadVelocity()
 

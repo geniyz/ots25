@@ -22,4 +22,6 @@ class Vector(
             companion object{
         val NONE = Vector(Double.NaN, Double.NaN)
     }
+
+    override fun toString()= "${x}×${y}"
 }
