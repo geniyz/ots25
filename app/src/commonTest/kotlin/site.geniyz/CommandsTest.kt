@@ -1,9 +1,8 @@
 package site.geniyz.ots
 
-import site.geniyz.ots.fuel.BurnFuelCommand
-import site.geniyz.ots.fuel.CheckFuelCommand
-import site.geniyz.ots.fuel.CommandException
-import site.geniyz.ots.fuel.FuelableAdapter
+import site.geniyz.ots.fuel.*
+import site.geniyz.ots.moving.MovableAdpater
+import site.geniyz.ots.moving.Move
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +13,7 @@ class `Макрокоманды` {
         val ss = Spaceship(
             "fuelLevel" to 10L,
         )
-        CheckFuelCommand(FuelableAdapter(ss)).execute()
+        CheckFuelCommand(FuelableAdapter(ss), 1L).execute()
     }
 
     @Test(expected = CommandException::class)
@@ -22,15 +21,24 @@ class `Макрокоманды` {
         val ss = Spaceship(
             "fuelLevel" to 0L,
         )
-        CheckFuelCommand(FuelableAdapter(ss)).execute()
+        CheckFuelCommand(FuelableAdapter(ss), 1L).execute()
     }
+
+    @Test(expected = CommandException::class)
+    fun `CheckFuelCommand проверяет, что топлива достаточно, если нет, то выбрасывает исключение CommandException → мало`() {
+        val ss = Spaceship(
+            "fuelLevel" to 23L,
+        )
+        CheckFuelCommand(FuelableAdapter(ss), 27L).execute()
+    }
+
 
     @Test
     fun `Топливо сгорает с 10 до 9 за один шаг`(){
         val ss = Spaceship(
             "fuelLevel" to 10L,
         )
-        BurnFuelCommand(FuelableAdapter(ss)).execute()
+        BurnFuelCommand(FuelableAdapter(ss), 1L).execute()
         assertEquals(ss.params["fuelLevel"], 9L)
     }
 
@@ -49,5 +57,67 @@ class `Макрокоманды` {
             "fuelLevel" to 7L,
         )
         BurnFuelCommand(FuelableAdapter(ss), -3L).execute()
+    }
+
+    @Test
+    fun `Движение по прямой с расходом топлива → два шага → ок`(){
+        val ss = Spaceship(
+            "position"  to Vector(12, 5),
+            "velocity"  to Vector(-7, 3),
+            "fuelLevel" to 7L,
+        )
+
+        val move = MoveFuelableCommand(ss, 3)
+
+        move.execute()
+        assertEquals((ss["position"] as Vector).x, 5.toDouble())
+        assertEquals((ss["position"] as Vector).y, 8.toDouble())
+        assertEquals((ss["fuelLevel"] as Long), 4L)
+
+        move.execute()
+        assertEquals((ss["position"] as Vector).x, (-2).toDouble())
+        assertEquals((ss["position"] as Vector).y, 11.toDouble())
+        assertEquals((ss["fuelLevel"] as Long), 1L)
+
+    }
+
+    @Test
+    fun `Движение по прямой с расходом топлива → два шага без расхода → ок`(){
+        val ss = Spaceship(
+            "position"  to Vector(12, 5),
+            "velocity"  to Vector(-7, 3),
+            "fuelLevel" to 7L,
+        )
+
+        val move = MoveFuelableCommand(ss, 0)
+
+        move.execute()
+        assertEquals((ss["position"] as Vector).x, 5.toDouble())
+        assertEquals((ss["position"] as Vector).y, 8.toDouble())
+        assertEquals((ss["fuelLevel"] as Long), 7L)
+
+        move.execute()
+        assertEquals((ss["position"] as Vector).x, (-2).toDouble())
+        assertEquals((ss["position"] as Vector).y, 11.toDouble())
+        assertEquals((ss["fuelLevel"] as Long), 7L)
+
+    }
+
+
+    @Test(expected = CommandException::class)
+    fun `Движение по прямой с расходом топлива → два шага → ошибка`(){
+        val ss = Spaceship(
+            "position"  to Vector(12, 5),
+            "velocity"  to Vector(-7, 3),
+            "fuelLevel" to 7L,
+        )
+        val move = MoveFuelableCommand(ss, 4L)
+
+        move.execute()
+        assertEquals((ss["position"] as Vector).x, 5.toDouble())
+        assertEquals((ss["position"] as Vector).y, 8.toDouble())
+        assertEquals((ss["fuelLevel"] as Long), 3L)
+
+        move.execute() // тут должно упасть, поскольку топлива на очередной шаг не достаточно
     }
 }
