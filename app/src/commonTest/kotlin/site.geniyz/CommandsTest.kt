@@ -1,8 +1,6 @@
 package site.geniyz.ots
 
 import site.geniyz.ots.fuel.*
-import site.geniyz.ots.moving.MovableAdpater
-import site.geniyz.ots.moving.Move
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

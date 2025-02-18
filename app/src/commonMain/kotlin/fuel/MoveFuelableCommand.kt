@@ -6,8 +6,8 @@ import site.geniyz.ots.moving.MovableAdpater
 import site.geniyz.ots.moving.Move
 
 class MoveFuelableCommand( // Реализовать команду движения по прямой с расходом топлива, используя команды с предыдущих шагов
-    val o: UObject,
-    val q: Long = 1,
+    o: UObject,
+    q: Long = 1,
 ): MacroCommand(
     CheckFuelCommand(FuelableAdapter(o), q), // проверка достаточности топлива
     BurnFuelCommand(FuelableAdapter(o), q),  // сжигание топлива
