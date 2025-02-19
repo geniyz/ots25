@@ -2,6 +2,7 @@ package site.geniyz.ots
 
 import site.geniyz.ots.fuel.*
 import site.geniyz.ots.macro.MoveFuelableCommand
+import site.geniyz.ots.macro.RotateWithChangeVelocityCommand
 import site.geniyz.ots.moving.ChangeVelocityCommand
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -139,6 +140,36 @@ class `Макрокоманды` {
         ChangeVelocityCommand(ss, Vector(5,2)).execute()
     }
 
+    @Test
+    fun `Поворот, который меняет вектор перемещения`(){
+        val ss = Spaceship(
+            "position"        to Vector(0, 0),
+            "velocity"        to Vector(5, 0),
+            "direction"       to 0,
+            "angularVelocity" to 90,
+            "fuelLevel"       to 100L,
+        )
+        RotateWithChangeVelocityCommand(ss).execute()
+        assertEquals((ss["velocity"] as Vector).x, 0.0)
+        assertEquals((ss["velocity"] as Vector).y, 5.0)
+        assertEquals(ss["direction"] as Int, 90)
+
+        RotateWithChangeVelocityCommand(ss).execute()
+        assertEquals((ss["velocity"] as Vector).x, -5.0)
+        assertEquals((ss["velocity"] as Vector).y, 0.0)
+        assertEquals(ss["direction"] as Int, 180)
+
+        RotateWithChangeVelocityCommand(ss).execute()
+        assertEquals((ss["velocity"] as Vector).x, -0.0)
+        assertEquals((ss["velocity"] as Vector).y, -5.0)
+        assertEquals(ss["direction"] as Int, 270)
+
+        RotateWithChangeVelocityCommand(ss).execute()
+        assertEquals((ss["velocity"] as Vector).x, 5.0)
+        assertEquals((ss["velocity"] as Vector).y, -0.0)
+        assertEquals(ss["direction"] as Int, 0)
+
+    }
 
 
 }

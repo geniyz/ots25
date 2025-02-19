@@ -13,7 +13,7 @@ class `Поворот` {
             "angularVelocity" to 3,
             "direction" to 10,
         )
-        Rotate(RotableAdpater(ss)).execute()
+        Rotate(RotableAdapter(ss)).execute()
 
         assertEquals(ss["direction"], 13)
     }
@@ -26,7 +26,7 @@ class `Поворот` {
             "angularVelocity" to 10,
             "direction" to 355,
         )
-        Rotate(RotableAdpater(ss)).execute()
+        Rotate(RotableAdapter(ss)).execute()
 
         assertEquals(ss["direction"], 5)
     }
