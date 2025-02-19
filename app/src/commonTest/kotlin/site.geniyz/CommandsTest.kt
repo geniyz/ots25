@@ -1,6 +1,7 @@
 package site.geniyz.ots
 
 import site.geniyz.ots.fuel.*
+import site.geniyz.ots.macro.MoveFuelableCommand
 import site.geniyz.ots.moving.ChangeVelocityCommand
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -137,4 +138,7 @@ class `Макрокоманды` {
         val ss = Spaceship()
         ChangeVelocityCommand(ss, Vector(5,2)).execute()
     }
+
+
+
 }

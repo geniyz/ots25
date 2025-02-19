@@ -1,4 +1,6 @@
-package site.geniyz.ots.commands
+package site.geniyz.ots.macro
+
+import site.geniyz.ots.commands.Executable
 
 open class MacroCommand(
     val commands: List<Executable>

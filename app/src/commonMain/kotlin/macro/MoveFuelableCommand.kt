@@ -1,7 +1,9 @@
-package site.geniyz.ots.fuel
+package site.geniyz.ots.macro
 
 import site.geniyz.ots.UObject
-import site.geniyz.ots.commands.MacroCommand
+import site.geniyz.ots.fuel.BurnFuelCommand
+import site.geniyz.ots.fuel.CheckFuelCommand
+import site.geniyz.ots.fuel.FuelableAdapter
 import site.geniyz.ots.moving.MovableAdpater
 import site.geniyz.ots.moving.Move
 
