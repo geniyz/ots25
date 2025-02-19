@@ -1,6 +1,7 @@
 package site.geniyz.ots
 
 import site.geniyz.ots.fuel.*
+import site.geniyz.ots.moving.ChangeVelocityCommand
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -117,5 +118,23 @@ class `Макрокоманды` {
         assertEquals((ss["fuelLevel"] as Long), 3L)
 
         move.execute() // тут должно упасть, поскольку топлива на очередной шаг не достаточно
+    }
+
+    @Test
+    fun `ChangeVelocityCommand меняет скорость`(){
+        val ss = Spaceship(
+            "position"  to Vector(12, 5),
+            "velocity"  to Vector(-7, 3),
+            "fuelLevel" to 7L,
+        )
+        ChangeVelocityCommand(ss, Vector(5,2)).execute()
+        assertEquals((ss["velocity"] as Vector).x, 5.0)
+        assertEquals((ss["velocity"] as Vector).y, 2.0)
+    }
+
+    @Test(expected = CommandException::class)
+    fun `ChangeVelocityCommand падает, если не умеет двигаться`(){
+        val ss = Spaceship()
+        ChangeVelocityCommand(ss, Vector(5,2)).execute()
     }
 }
