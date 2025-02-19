@@ -23,11 +23,11 @@ class `SOLID и исключения` {
 
         val commands = ArrayDeque<Executable>()
 
-        commands.add(Move(MovableAdpater(ssOk)))
-        commands.add(Move(MovableAdpater(ssOk)))
-        commands.add(Move(MovableAdpater(ssBroke)))
-        commands.add(Move(MovableAdpater(ssOk)))
-        commands.add(Move(MovableAdpater(ssOk)))
+        commands.add(Move(MovableAdapter(ssOk)))
+        commands.add(Move(MovableAdapter(ssOk)))
+        commands.add(Move(MovableAdapter(ssBroke)))
+        commands.add(Move(MovableAdapter(ssOk)))
+        commands.add(Move(MovableAdapter(ssOk)))
 
         // ПРОШУ ПОДСКАЗАТЬ, КАК ЭТО ДЕЛАТЬ ПРАВИЛЬНО
         // Я ДАЛЁК ОТ РЕФЛЕКСИИ
@@ -64,7 +64,7 @@ class `SOLID и исключения` {
             "velocity" to Vector(Double.NaN, Double.NaN),
         )
         val commands = ArrayDeque<Executable>()
-        commands.add(Move(MovableAdpater(ssBroke))) // в очередь команд добавляется «плохая»
+        commands.add(Move(MovableAdapter(ssBroke))) // в очередь команд добавляется «плохая»
 
         // регистрация повторителя:
         ExceptionHandler.register(Move::class.toString(), BadVelocity::class.toString()) { c, e -> commands.addFirst( RepeatCommand(c) ) }
@@ -88,7 +88,7 @@ class `SOLID и исключения` {
             "velocity" to Vector(Double.NaN, Double.NaN),
         )
         val commands = ArrayDeque<Executable>()
-        commands.add(Move(MovableAdpater(ssBroke))) // в очередь команд добавляется «плохая»
+        commands.add(Move(MovableAdapter(ssBroke))) // в очередь команд добавляется «плохая»
 
         // регистрация повторителя:
         ExceptionHandler.register(Move::class.toString(), BadVelocity::class.toString()) { c, e -> commands.addFirst( RepeatCommand(c) ) }

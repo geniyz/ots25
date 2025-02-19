@@ -3,7 +3,7 @@ package site.geniyz.ots.moving
 import site.geniyz.ots.UObject
 import site.geniyz.ots.Vector
 
-class MovableAdpater(val o: UObject): Movable {
+class MovableAdapter(val o: UObject): Movable {
 
     override var position: Vector
         get()= (o["position"] ?: Vector.NONE) as Vector
