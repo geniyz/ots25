@@ -2,7 +2,7 @@ package site.geniyz.ots.rotating
 
 import site.geniyz.ots.UObject
 
-class RotableAdpater(val o: UObject): Rotable {
+class RotableAdapter(val o: UObject): Rotable {
 
     override var direction: Int
         get()= o["direction"] as Int
