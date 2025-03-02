@@ -6,6 +6,7 @@ import site.geniyz.ots.ioc.InitCommand
 import site.geniyz.ots.ioc.IoC
 import site.geniyz.ots.moving.Movable
 import site.geniyz.ots.moving.Move
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -47,6 +48,12 @@ class `Тестирование генерации кода` {
                 return@resolve (args[0] as UObject)["velocity"] as Vector
             }).execute()
 
+        IoC.resolve<Executable>("IoC.Register",
+            "Adapter",
+            { args: List<Any> ->
+                return@resolve Generator.generateClassItem(args[0] as KClass<*>, args[1])
+            }).execute()
+
         val ss = Spaceship(
             "position" to Vector(12, 5),
             "velocity" to Vector(-7, 3),
@@ -54,7 +61,7 @@ class `Тестирование генерации кода` {
 
 
         Move(
-            Generator.generateClassItem(Movable::class, ss)
+            IoC.resolve("Adapter", Movable::class, ss),
         ).execute()
 
 
