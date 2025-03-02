@@ -1,0 +1,77 @@
+package site.geniyz.ots
+
+import site.geniyz.ots.adapter.Generator
+import site.geniyz.ots.commands.Executable
+import site.geniyz.ots.ioc.InitCommand
+import site.geniyz.ots.ioc.IoC
+import site.geniyz.ots.moving.Movable
+import site.geniyz.ots.moving.Move
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+
+class `Тестирование генерации кода` {
+    @Test
+    fun `Корректность исходника`(){
+        val src = Generator.generateClassSourceCode(Movable::class, "Klazz")
+
+        assertContains(src, "override var position: ")  // наличие поля position
+        assertContains(src, "override val velocity: ")  // наличие поля velocity
+
+        // нет ни чего лишнего:
+        assertEquals(2, src.qty("override va"))    // всего два свойства
+        assertEquals(2, src.qty("get()="))         // два геттера
+        assertEquals(1, src.qty("set(newValue)"))  // один сеттер
+    }
+
+    @Test
+    fun `Движение по прямой`(){
+
+        InitCommand().execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.moving.Movable:position.get",
+            { args: List<Any> ->
+                return@resolve (args[0] as UObject)["position"] as Vector
+            }).execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.moving.Movable:position.set",
+            { args: List<Any> ->
+                (args[0] as UObject)["position"] = (args[1] as Vector)
+            }).execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.moving.Movable:velocity.get",
+            { args: List<Any> ->
+                return@resolve (args[0] as UObject)["velocity"] as Vector
+            }).execute()
+
+        val ss = Spaceship(
+            "position" to Vector(12, 5),
+            "velocity" to Vector(-7, 3),
+        )
+
+
+        Move(
+            Generator.generateClassItem(Movable::class, ss)
+        ).execute()
+
+
+        assertEquals((ss["position"] as Vector).x, 5.toDouble())
+        assertEquals((ss["position"] as Vector).y, 8.toDouble())
+
+    }
+}
+
+fun String.qty(substring: String): Int { // кол-во вхождений подстроки в строку
+    var cnt = 0
+    var i = 0
+    while (true) {
+        i = indexOf(substring, i)
+        if (i<0) break
+        cnt++
+        i += substring.length
+    }
+    return cnt
+}
