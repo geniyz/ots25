@@ -17,15 +17,38 @@ class Generator{
                         val obj: ${UObject::class.qualifiedName}
                     ) : ${iface.qualifiedName} {
                         ${
-                            iface.memberProperties.joinToString("\n\n") { m ->
+                            iface.memberProperties.joinToString("\n") { m ->
                                 val lr = if(m is KMutableProperty<*>){"var"}else{"val"}
                                 """
-                                    override $lr ${m.name}: ${m.returnType.javaType.typeName}
+                                    override $lr ${m.name}: ${m.returnType}
                                         get()= ${IoC::class.qualifiedName}.resolve("${iface.qualifiedName}:${m.name}.get", obj)
                                         ${ if(lr == "val"){ "" }else{"""
                                         set(newValue){ ${IoC::class.qualifiedName}.resolve<Unit>("${iface.qualifiedName}:${m.name}.set", obj, newValue)}
                                         """.trimEnd()
                                         }}
+                                """.trimEnd()
+                            }
+                        }
+                        ${
+                            iface
+                                .declaredFunctions
+                                .joinToString("\n") { f -> 
+                                """
+                                    override fun ${f.name}(${
+                                        f.parameters
+                                            .filter { p -> p.name != null }
+                                            .joinToString(", ") { p -> 
+                                                """ ${ if(p.isVararg){" vararg "}else{""} } ${p.name}: ${p.type}"""
+                                            }
+                                        }): ${f.returnType} {
+                                        return ${IoC::class.qualifiedName}.resolve("${iface.qualifiedName}:${f.name}", obj,
+                                            ${
+                                                f.parameters
+                                                    .filter { p -> p.name != null }
+                                                    .joinToString(", "){ p -> """${p.name}""" }
+                                            }
+                                            )
+                                    }
                                 """.trimEnd()
                             }
                         }

@@ -69,6 +69,45 @@ class `Тестирование генерации кода` {
         assertEquals((ss["position"] as Vector).y, 8.toDouble())
 
     }
+
+    @Test
+    fun `Методы`(){
+
+        InitCommand().execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "Adapter",
+            { args: List<Any> ->
+                return@resolve Generator.generateClassItem(args[0] as KClass<*>, args[1])
+            }).execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.ITestInterface:calc",
+            { args: List<Any> ->
+                val o = (args[0] as UObject)
+                return@resolve (o["a"] as Int) + (o["z"] as Int)
+            }).execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.ITestInterface:sum",
+            { args: List<Any> ->
+                return@resolve (args[1] as Int)+(args[2] as Int)
+            }).execute()
+
+        IoC.resolve<Executable>("IoC.Register",
+            "site.geniyz.ots.ITestInterface:execute",
+            { args: List<Any> ->
+                /**/
+            }).execute()
+
+        val o = Spaceship("a" to 5, "z" to 2)
+        val x = IoC.resolve<ITestInterface>("Adapter", ITestInterface::class, o)
+
+        assertEquals(7, IoC.resolve("site.geniyz.ots.ITestInterface:calc", o))
+        assertEquals(7, IoC.resolve("site.geniyz.ots.ITestInterface:sum", o, 2, 5))
+        assert(IoC.resolve<Unit>("site.geniyz.ots.ITestInterface:execute", o) is Unit)
+    }
+
 }
 
 fun String.qty(substring: String): Int { // кол-во вхождений подстроки в строку
@@ -81,4 +120,12 @@ fun String.qty(substring: String): Int { // кол-во вхождений по�
         i += substring.length
     }
     return cnt
+}
+
+interface ITestInterface {
+    var a: Int
+    val z: Int
+    fun calc(): Int
+    fun sum(a: Int, b: Int): Int
+    fun execute()
 }

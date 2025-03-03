@@ -12,7 +12,7 @@ object IoC { // синглтон ради стабильной работы в �
         }
 
         // fun <T> resolve(key: String): T                   = strategy(key, emptyList()  ) as T
-        fun <T> resolve(key: String, vararg args: Any = arrayOf()): T = strategy(key, args.asList()) as T
+        fun <T> resolve(key: String, vararg args: Any? = arrayOf()): T = strategy(key, args.asList()) as T
 
         // fun bind(key: String, obj: (List<Any>)->Unit){
         //
