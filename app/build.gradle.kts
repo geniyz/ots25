@@ -9,6 +9,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
+
+                implementation(kotlin("reflect"))
+                implementation(kotlin("scripting-jsr223"))
             }
         }
         val commonTest by getting {
