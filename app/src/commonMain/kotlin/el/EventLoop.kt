@@ -4,6 +4,7 @@ import site.geniyz.ots.commands.Executable
 import site.geniyz.ots.ioc.IoC
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
+import kotlin.collections.addAll
 import kotlin.concurrent.thread
 
 class EventLoop(
@@ -46,6 +47,7 @@ class EventLoop(
 
     fun join()= thread.join()
 
+    fun add(c: List<Executable>)= queue.addAll(c)
     fun add(vararg c: Executable)= queue.addAll(c)
 
     // fun setTick(action: ()->Unit){ tick = action }
