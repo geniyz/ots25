@@ -16,7 +16,7 @@ class EventLoop(
 
     private lateinit var thread: Thread
     private var running = true
-    private val defaultTick = {
+    private val defaultTick: ()->Unit = {
         val command = queue.take()
         try {
             command.execute()

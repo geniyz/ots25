@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ReceiveData(
-    val game: String = "",
+    val game: Int = -1,
     val obj: String = "",
     val actions: List<ReceiveAction>
 )
