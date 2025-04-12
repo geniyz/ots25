@@ -13,19 +13,21 @@ import site.geniyz.ots.rim.ReceiveAction
 import site.geniyz.ots.rim.ReceiveCommand
 import java.util.ArrayList
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-class Game(val scope: Any, val el: EventLoop, var objs: MutableList<UObject>)
+class Game(
+    val scope: Any,
+    val el: EventLoop,
+    var objs: MutableList<UObject>,
+)
 
 class `Тесты «работы с сообщениями»` {
 
-    @Test
-    fun `Тесты интерпретации комманд`() {
+    var games = mutableListOf<Game>() // перечень игр
 
+    init {
         InitCommand().execute()
-
-        var games = mutableListOf<Game>() // перечень игр
-        // var objs = mutableListOf<UObject>() // игровые объекты
 
         IoC.resolve<Executable>("IoC.Register",
             "Начать новую игру",
@@ -43,14 +45,12 @@ class `Тесты «работы с сообщениями»` {
         IoC.resolve<Executable>("IoC.Register",
             "Добавить объекты",
             { args: List<UObject> ->
-                println("Добавить объекты: $args")
                 games.first { it.scope == IoC.resolve("IoC.Scope.Current") }.objs.addAll(args)
             }).execute()
 
         IoC.resolve<Executable>("IoC.Register",
             "Переключиться на игру",
             { args: List<Int> ->
-                println("Переключиться на игру: $args")
                 IoC.resolve<Executable>("IoC.Scope.Current.Set", games[args[0]].scope)
             }).execute()
 
@@ -63,7 +63,6 @@ class `Тесты «работы с сообщениями»` {
         IoC.resolve<Executable>("IoC.Register",
             "Определение действия",
             { args: List<Any?> ->
-                println("Определение действия: $args")
                 InterpretCommand(
                     gameCode = args[0].toString(),
                     gameObj  = args[1] as UObject,
@@ -74,36 +73,36 @@ class `Тесты «работы с сообщениями»` {
         IoC.resolve<Executable>("IoC.Register",
             "Очередь команд",
             { args: List<Executable> ->
-                println("Очередь команд: $args")
                 games.first { it.scope == IoC.resolve("IoC.Scope.Current") }.el.add(args)
             }).execute()
 
         IoC.resolve<Executable>("IoC.Register",
             "Задать скорость",
             { args: List<Any> ->
-                println("Задать скорость: $args")
-                ChangeVelocityCommand(args[0] as UObject, Vector(args[1] as Double, args[2] as Double))
-            })
+                val newVelocity = args[1] as ArrayList<String>
+                ChangeVelocityCommand(args[0] as UObject, Vector( newVelocity[0].toDouble(), newVelocity[1].toDouble()))
+            }).execute()
 
         IoC.resolve<Executable>("IoC.Register",
             "Задать координаты",
             { args: List<Any> ->
-                println("Задать координаты: $args")
-                val newVelocity = args[1] as ArrayList<String>
-                MovableAdapter(args[0] as UObject).position = Vector( newVelocity[0].toDouble(), newVelocity[1].toDouble())
+                val newPosition = args[1] as ArrayList<String>
+                MovableAdapter(args[0] as UObject).position = Vector( newPosition[0].toDouble(), newPosition[1].toDouble())
             }).execute()
 
         IoC.resolve<Executable>("IoC.Register",
             "Шагнуть",
             { args: List<Any> ->
-                println("Шагнуть: $args")
                 Move( MovableAdapter(args[0] as UObject) )
             }).execute()
 
+    }
 
-        assertEquals(0, games.size)
+    @Test
+    fun `Тесты интерпретации комманд`() {
+
         val g = IoC.resolve<Game>("Начать новую игру")
-        assertEquals(1, games.size)
+        assertContains(games, g)
 
         IoC.resolve<Executable>("Переключиться на игру", 0).execute()
 
@@ -128,10 +127,44 @@ class `Тесты «работы с сообщениями»` {
             }
         """.trimIndent()).execute()
 
+        ReceiveCommand("""
+            {
+                 "game": "0"
+                ,"obj": "${g.objs.first()["id"]}"
+                ,"actions": [
+                    {
+                          "id": "Задать скорость"
+                         ,"args": ["1", "0"]
+                    }
+                 ]
+            }
+        """.trimIndent()).execute()
+
+        ReceiveCommand("""
+            {
+                 "game": "0"
+                ,"obj": "${g.objs.first()["id"]}"
+                ,"actions": [
+                    {
+                          "id": "Шагнуть"
+                         ,"args": []
+                    }
+                 ]
+            }
+        """.trimIndent()).execute()
+
         g.el.add(SoftStopCommand(g.el))
         g.el.join()
 
-        assertEquals(MovableAdapter(g.objs.first()).position.toString(), Vector(1,5).toString())
+        assertEquals(
+            MovableAdapter(g.objs.first()).position.toString(),
+            Vector(2,5).toString(),
+        )
+
+        assertEquals(
+            MovableAdapter(g.objs.first()).velocity.toString(),
+            Vector(1,0).toString(),
+        )
 
     }
 
