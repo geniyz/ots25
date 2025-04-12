@@ -5,11 +5,19 @@ import site.geniyz.ots.UObject
 import site.geniyz.ots.commands.Executable
 import site.geniyz.ots.ioc.IoC
 
+val json = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    isLenient = true
+    allowTrailingComma = true
+    allowComments = true
+}
+
 class ReceiveCommand(
     private val content: String,
 ): Executable {
     override fun execute() {
-            val data: ReceiveData = Json.decodeFromString(content)
+            val data: ReceiveData = json.decodeFromString(content)
 
             IoC.resolve<Executable>("Переключиться на игру", data.game ).execute() // переключиться на необходимую игру
 
