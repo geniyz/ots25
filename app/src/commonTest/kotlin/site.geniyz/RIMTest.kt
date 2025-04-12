@@ -5,6 +5,7 @@ import site.geniyz.ots.el.EventLoop
 import site.geniyz.ots.el.SoftStopCommand
 import site.geniyz.ots.ioc.InitCommand
 import site.geniyz.ots.ioc.IoC
+import site.geniyz.ots.moving.ChangePositionCommand
 import site.geniyz.ots.moving.ChangeVelocityCommand
 import site.geniyz.ots.moving.MovableAdapter
 import site.geniyz.ots.moving.Move
@@ -87,7 +88,7 @@ class `Тесты «работы с сообщениями»` {
             "Задать координаты",
             { args: List<Any> ->
                 val newPosition = args[1] as ArrayList<String>
-                MovableAdapter(args[0] as UObject).position = Vector( newPosition[0].toDouble(), newPosition[1].toDouble())
+                ChangePositionCommand(args[0] as UObject, Vector( newPosition[0].toDouble(), newPosition[1].toDouble()))
             }).execute()
 
         IoC.resolve<Executable>("IoC.Register",
