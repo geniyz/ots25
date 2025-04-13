@@ -10,9 +10,8 @@ import site.geniyz.ots.UObject
 import java.util.*
 
 class KafkaCustomizableAdapter(
-    private val o: UObject,
+    private val c: UObject,
 ): KafkaCustomizable {
-    private val c = o["kafka"] as Map<*, *>
 
     override val hosts: List<String>
         get() = c["hosts"]?.let{

@@ -20,6 +20,8 @@ kotlin {
                 implementation(libs.kotlinx.serialization.core)
                 implementation(libs.kotlinx.serialization.json)
 
+                implementation(libs.kotlinx.datetime)
+
                 implementation(libs.logback.classic)
 
             }
@@ -27,6 +29,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test.junit)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
     }
