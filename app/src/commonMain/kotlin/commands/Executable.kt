@@ -1,5 +1,5 @@
 package site.geniyz.ots.commands
 
 interface Executable {
-    fun execute()
+    fun execute():Any?
 }

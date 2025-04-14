@@ -16,7 +16,7 @@ class EventLoop(
 
     private lateinit var thread: Thread
     private var running = true
-    private val defaultTick = {
+    private val defaultTick: ()->Unit = {
         val command = queue.take()
         try {
             command.execute()
@@ -27,10 +27,12 @@ class EventLoop(
     var tick: ()->Unit = defaultTick
     var onEnd: ()->Unit = {}
 
-    // val queueCount: Int
-    //     get()= queue.size
+    val size: Int
+        get()= queue.size
+
     val isEmpty: Boolean
         get()= queue.isEmpty()
+    val isNotEmpty: Boolean = !isEmpty
 
     fun start() {
         thread = thread(isDaemon = false) {
