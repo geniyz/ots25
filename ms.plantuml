@@ -1,0 +1,48 @@
+@startuml Архитектура микросервисов
+
+rectangle "Клиент" as gameclient
+rectangle "Админка" as admin
+
+rectangle "Сервис управления пользователями" as userservice {
+  database [База данных пользователей] as userdb
+}
+userservice --> userdb : "Хранение данных"
+
+rectangle "Сервис планирования сражений" as tournamentservice {
+  database [Расписание боёв] as tourndb
+}
+tournamentservice --> tourndb : "Хранение данных"
+
+rectangle "Сервис сражений" as battleservice {
+  [Battle Engine] as engine
+}
+
+rectangle "Сервис рассылки уведомлений" as notifications {
+    [SMS] as engineSMS
+    [Mail] as engineMail
+    [Push] as enginePush
+}
+
+rectangle "Хранение записей боёв" as replay {
+    [S3] as replaydb
+}
+replay --> replaydb : "Хранение записей"
+
+
+gameclient --> userservice : "Регистрация/Аутентификация"
+gameclient --> tournamentservice : "Просмотр турниров"
+gameclient --> replay : "Запрос записей боёв"
+gameclient --> battleservice : "Участие в бою"
+
+admin -up-> tournamentservice : "Модерация"
+admin -up-> userservice : "Управление пользователями"
+
+tournamentservice --> userservice : "Подбор противников"
+
+battleservice --> engine : "Игровая логика"
+battleservice --> userservice : "Обновление рейтинга"
+battleservice --> replay : "Сохранение боя"
+battleservice --> notifications : "Уведомления"
+
+
+@enduml
