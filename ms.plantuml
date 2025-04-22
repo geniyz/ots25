@@ -1,0 +1,92 @@
+@startuml Архитектура микросервисов
+
+rectangle "Клиент" as gameclient
+note right of gameclient
+  игровой клиент
+  тонкий клиент
+  фронтэнд
+end note
+
+rectangle "Админка" as admin
+note bottom
+  админский клиент
+  тонкий клиент
+  фронтэнд
+end note
+
+rectangle "Сервис управления пользователями" as userservice {
+  component [Аутентификация/авторизация] as userauth
+  database [База данных пользователей]   as userdb
+  component [Управление пользователями]  as usermgr
+  usermgr <-up-> userdb
+  userauth <-up-> userdb
+}
+note bottom of userauth
+  JWT
+  OAuth2
+  OpenID-Connect
+end note
+note bottom of usermgr
+  получает от админки и сервиса сражений
+  информацию для изменения информации
+end note
+
+rectangle "Сервис планирования сражений" as tournamentservice {
+  database [Расписание боёв] as tourndb
+  component [Логика планирования] as tournserv
+  tournserv <-up-> tourndb
+}
+note bottom of tournserv
+  принимает запросы от клиентов
+  запрашивает от клиентов/сервиса управления клиентов информацию о их рейтинге
+  подбирает подходящих по рейтингу клиентов
+  оповещает о готовности к сражению
+end note
+
+rectangle "Сервис сражений" as battleservice {
+  [Движок боёв] as engine
+}
+note bottom
+  принимает команды от клиентов
+  исполняет их
+  оповещает клиентов о изменениях в игре
+end note
+
+rectangle "Хранение записей боёв" as replay {
+  [S3] as replaydb
+  replay <--> replaydb : "Хранение записей"
+}
+note bottom
+  принимает от сервиса сражений отработанные команды
+  сохраняет их
+  отдаёт такие «записи» при запросе
+end note
+
+
+gameclient --> userauth : "Регистрация/Аутентификация"
+gameclient --> tournamentservice : "Просмотр турниров"
+gameclient --> replay : "Запрос записей боёв"
+gameclient --> battleservice : "Участие в бою"
+
+admin -up-> tournamentservice : "Модерация"
+admin -up-> usermgr : "Управление пользователями"
+
+tournamentservice --> userservice : "Подбор противников"
+
+battleservice --> engine  : "Игровая логика"
+battleservice --> usermgr : "Обновление рейтинга"
+battleservice --> replay  : "Сохранение боя"
+
+legend bottom
+    Взаимодействие между всеми сервисами реализуется посредством шины данных, например Kafka.
+
+    Наиболее узкими местами предполагаются взаимодействие между
+    клиентами и непосредственно сервисом сражений, потому как
+    именно здесь ожидается наибольшая нагрузка.
+    Данная проблема может решаться горизонтальным маштабированием.
+
+    Наиболее частым изменениям подвержен «Движок боёв».
+    А потому следует сразу планировать версионность его API.
+end legend
+
+@enduml
