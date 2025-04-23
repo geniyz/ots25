@@ -1,5 +1,6 @@
 package site.geniyz.ots.el
 
+import kotlinx.atomicfu.atomic
 import site.geniyz.ots.commands.Executable
 import site.geniyz.ots.ioc.IoC
 import java.util.concurrent.BlockingQueue
@@ -15,7 +16,7 @@ class EventLoop(
     constructor(): this( emptyList() )
 
     private lateinit var thread: Thread
-    private var running = true
+    // private var running = atomic(true)
     private val defaultTick: ()->Unit = {
         val command = queue.take()
         try {
@@ -24,7 +25,7 @@ class EventLoop(
             IoC.resolve<Executable>("HandleException", command, e).execute();
         }
     }
-    var tick: ()->Unit = defaultTick
+    var tick = atomic(defaultTick)
     var onEnd: ()->Unit = {}
 
     val size: Int
@@ -36,15 +37,17 @@ class EventLoop(
 
     fun start() {
         thread = thread(isDaemon = false) {
-            while (running) {
-                tick()
-            }
+            // while (running.value)
+            while(!thread.isInterrupted)
+                tick.value()
             onEnd()
         }
     }
 
     fun stop() {
-        running = false
+        // running.value = false
+        // add(object : Executable{ override fun execute(){} })
+        thread.interrupt()
     }
 
     fun join()= thread.join()
