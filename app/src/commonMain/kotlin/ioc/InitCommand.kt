@@ -3,34 +3,38 @@ package site.geniyz.ots.ioc
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.runBlocking
 import site.geniyz.ots.commands.Executable
+import java.util.concurrent.ConcurrentHashMap
 
-class InitCommand: Executable {
+class InitCommand(): Executable {
 
-    override fun execute() {
-        if (alreadyExecutesSuccessfully.value) return
+    override fun execute() = runBlocking {
 
-        runBlocking{
-            rootScope.value.putIfAbsent("IoC.Scope.Current.Set") {
+        if (alreadyExecutesSuccessfully.value) return@runBlocking
+
+            rootScope = ConcurrentHashMap<String, (List<Any?>?)->Any?>() // mutableMapOf<String, (List<Any?>?)->Any?>()
+            currentScopes = null // ThreadLocal<Any?>()
+
+            rootScope.putIfAbsent("IoC.Scope.Current.Set") {
                 return@putIfAbsent SetCurrentScopeCommand(it!!.first()!!)
             }
 
-            rootScope.value.putIfAbsent("IoC.Scope.Current.Clear") {
+            rootScope.putIfAbsent("IoC.Scope.Current.Clear") {
                 return@putIfAbsent ClearCurrentScopeCommand()
             }
 
-            rootScope.value.putIfAbsent("IoC.Scope.Current") {
-                return@putIfAbsent currentScopes.get() ?: rootScope.value
+            rootScope.putIfAbsent("IoC.Scope.Current") {
+                return@putIfAbsent currentScopes /*.get()*/ ?: rootScope
             }
 
-            rootScope.value.putIfAbsent("IoC.Scope.Parent") {
+            rootScope.putIfAbsent("IoC.Scope.Parent") {
                 return@putIfAbsent error("The root scope has no a parent scope.")
             }
 
-            rootScope.value.putIfAbsent("IoC.Scope.Create.Empty") {
+            rootScope.putIfAbsent("IoC.Scope.Create.Empty") {
                 return@putIfAbsent mutableMapOf<String, (List<Any?>?) -> Any?>()
             }
 
-            rootScope.value.putIfAbsent("IoC.Scope.Create") { args ->
+            rootScope.putIfAbsent("IoC.Scope.Create") { args ->
                 val prnt = if (args!!.isEmpty()) {
                     IoC.resolve("IoC.Scope.Current")
                 } else {
@@ -42,7 +46,7 @@ class InitCommand: Executable {
                 creatingScope
             }
 
-            rootScope.value.putIfAbsent("IoC.Register") {
+            rootScope.putIfAbsent("IoC.Register") {
                 RegisterDependencyCommand(
                     it!![0].toString(),
                     it!![1] as (List<Any?>?)->Any?,
@@ -52,20 +56,18 @@ class InitCommand: Executable {
             IoC.resolve<Executable>("Update Ioc Resolve Dependency Strategy",
                 { oldStrategy: Any ->
                     { key: String, args: List<Any?> ->
-                        DependencyResolver( currentScopes.get() ?: rootScope.value )
+                        DependencyResolver( currentScopes /*.get()*/ ?: rootScope )
                             .resolve(key, args)
                     }
                 }).execute()
 
-
             alreadyExecutesSuccessfully.value = true
-        }
+
     }
 
     companion object{
-        var currentScopes: ThreadLocal<Any?> = ThreadLocal<Any?>()
-        private var rootScope = atomic(mutableMapOf<String, (List<Any?>?)->Any?>())
+        var currentScopes: Any? = null // = ThreadLocal<Any?>()
+        private var rootScope = ConcurrentHashMap<String, (List<Any?>?)->Any?>() // mutableMapOf<String, (List<Any?>?)->Any?>()
         private var alreadyExecutesSuccessfully = atomic(false)
-
     }
 }

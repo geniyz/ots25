@@ -17,7 +17,7 @@ class AccCommand(
     val i2: Int,
 ): Executable {
     override fun execute() {
-        println(" ${ss["acc"] as Int} += $i2 ")
+        // println(" ${ss["acc"] as Int} += $i2 ")
         ss["acc"] = (ss["acc"] as Int) + i2
     }
 }
@@ -39,12 +39,12 @@ class EventLoopTest {
         val f = CountDownLatch(1)
         el.onEnd = {
             f.countDown()
-            println(" acc = ${ss["acc"]} ")
+            // println(" acc = ${ss["acc"]} ")
         }
         el.start()
         el.join()
         f.await()
-        println(" ВСЁ ")
+        // println(" ВСЁ ")
 
         assertEquals(6, ss["acc"] as Int)
     }
@@ -62,12 +62,12 @@ class EventLoopTest {
         val f = CountDownLatch(1)
         el.onEnd = {
             f.countDown()
-            println(" acc = ${ss["acc"]} ")
+            // println(" acc = ${ss["acc"]} ")
         }
         el.start()
         el.join()
         f.await()
-        println(" ВСЁ ")
+        // println(" ВСЁ ")
 
         assertEquals(6, ss["acc"] as Int)
     }
@@ -85,12 +85,12 @@ class EventLoopTest {
         val f = CountDownLatch(1)
         el.onEnd = {
             f.countDown()
-            println(" acc = ${ss["acc"]} ")
+            // println(" acc = ${ss["acc"]} ")
         }
         el.start()
         el.join()
         f.await()
-        println(" ВСЁ ")
+        // println(" ВСЁ ")
 
         assertEquals(6, ss["acc"] as Int)
     }
@@ -123,13 +123,13 @@ class EventLoopTest {
         val f = CountDownLatch(1)
         (IoC.resolve("el") as EventLoop).onEnd = {
             f.countDown()
-            println(" acc = ${ss["acc"]} ")
+            // println(" acc = ${ss["acc"]} ")
         }
 
         IoC.resolve<Executable>("el.start").execute()
 
         f.await()
-        println(" ВСЁ ")
+        // println(" ВСЁ ")
 
         assertEquals(6, ss["acc"] as Int)
     }

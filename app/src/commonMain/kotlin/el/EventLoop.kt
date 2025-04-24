@@ -16,13 +16,15 @@ class EventLoop(
     constructor(): this( emptyList() )
 
     private lateinit var thread: Thread
-    // private var running = atomic(true)
+    private val running = atomic(true)
     private val defaultTick: ()->Unit = {
+        // println(" in defaultTick $queue ")
         val command = queue.take()
         try {
             command.execute()
         } catch (e: Throwable) {
-            IoC.resolve<Executable>("HandleException", command, e).execute();
+            println("error when command : $command : $e")
+            IoC.resolve<Executable>("HandleException", command, e).execute()
         }
     }
     var tick = atomic(defaultTick)
@@ -37,24 +39,20 @@ class EventLoop(
 
     fun start() {
         thread = thread(isDaemon = false) {
-            // while (running.value)
-            while(!thread.isInterrupted)
-                tick.value()
+            while( running.value ) tick.value()
             onEnd()
         }
     }
 
     fun stop() {
-        // running.value = false
-        // add(object : Executable{ override fun execute(){} })
-        thread.interrupt()
+        running.value = false
+        add(object : Executable{ override fun execute(){} })
+        // thread.interrupt()
     }
 
     fun join()= thread.join()
 
     fun add(c: List<Executable>)= queue.addAll(c)
     fun add(vararg c: Executable)= queue.addAll(c)
-
-    // fun setTick(action: ()->Unit){ tick = action }
 
 }
