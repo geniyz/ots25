@@ -6,8 +6,8 @@ class SoftStopCommand(
     private val el: EventLoop
 ): Executable {
     override fun execute() {
-        val currentTick = el.tick
-        el.tick = {
+        val currentTick = el.tick.value
+        el.tick.value = {
             if (el.isEmpty) {
                 el.stop()
             } else {

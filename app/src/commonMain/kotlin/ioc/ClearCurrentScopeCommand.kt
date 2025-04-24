@@ -4,6 +4,6 @@ import site.geniyz.ots.commands.Executable
 
 class ClearCurrentScopeCommand:Executable {
     override fun execute() {
-        InitCommand.currentScopes.set(null)
+        InitCommand.currentScopes = null // .set(null) // = ThreadLocal<Any?>()
     }
 }

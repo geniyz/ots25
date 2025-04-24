@@ -1,14 +1,19 @@
 package site.geniyz.ots.ioc
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.runBlocking
 import site.geniyz.ots.commands.Executable
+import java.util.concurrent.ConcurrentHashMap
 
-class InitCommand: Executable {
+class InitCommand(): Executable {
 
-    override fun execute() {
-        if (alreadyExecutesSuccessfully) return
+    override fun execute() = runBlocking {
 
-        runBlocking{
+        if (alreadyExecutesSuccessfully.value) return@runBlocking
+
+            rootScope = ConcurrentHashMap<String, (List<Any?>?)->Any?>() // mutableMapOf<String, (List<Any?>?)->Any?>()
+            currentScopes = null // ThreadLocal<Any?>()
+
             rootScope.putIfAbsent("IoC.Scope.Current.Set") {
                 return@putIfAbsent SetCurrentScopeCommand(it!!.first()!!)
             }
@@ -18,7 +23,7 @@ class InitCommand: Executable {
             }
 
             rootScope.putIfAbsent("IoC.Scope.Current") {
-                return@putIfAbsent currentScopes.get() ?: rootScope
+                return@putIfAbsent currentScopes /*.get()*/ ?: rootScope
             }
 
             rootScope.putIfAbsent("IoC.Scope.Parent") {
@@ -51,20 +56,18 @@ class InitCommand: Executable {
             IoC.resolve<Executable>("Update Ioc Resolve Dependency Strategy",
                 { oldStrategy: Any ->
                     { key: String, args: List<Any?> ->
-                        DependencyResolver( currentScopes.get() ?: rootScope )
+                        DependencyResolver( currentScopes /*.get()*/ ?: rootScope )
                             .resolve(key, args)
                     }
                 }).execute()
 
+            alreadyExecutesSuccessfully.value = true
 
-            alreadyExecutesSuccessfully = true
-        }
     }
 
     companion object{
-        var currentScopes: ThreadLocal<Any?> = ThreadLocal<Any?>()
-        private var rootScope: MutableMap<String, (List<Any?>?)->Any?> = mutableMapOf()
-        private var alreadyExecutesSuccessfully = false
-
+        var currentScopes: Any? = null // = ThreadLocal<Any?>()
+        private var rootScope = ConcurrentHashMap<String, (List<Any?>?)->Any?>() // mutableMapOf<String, (List<Any?>?)->Any?>()
+        private var alreadyExecutesSuccessfully = atomic(false)
     }
 }

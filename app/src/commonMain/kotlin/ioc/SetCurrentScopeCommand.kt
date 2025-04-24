@@ -6,6 +6,6 @@ class SetCurrentScopeCommand(
     private val scope: Any
 ): Executable {
     override fun execute() {
-        InitCommand.currentScopes.set(scope)
+        InitCommand.currentScopes = scope //.set(scope)
     }
 }

@@ -108,24 +108,28 @@ class `Тесты использования IoC` {
             }).execute()
 
 
-        GlobalScope.launch { // по потоку на вызов
+        val j = GlobalScope.launch { // по потоку на вызов
             rez = IoC.resolve("сложение", -1, -2, 3, 4)
             assertEquals(rez, 10)
         }
 
-            coroutineScope {
-                launch { // по потоку на вызов
+            val c = coroutineScope {
+                val a = launch { // по потоку на вызов
                     rez = IoC.resolve("вычитание", 7, 2)
                     assertEquals(rez, 5)
                 }
 
-                launch { // по потоку на вызов
+                val b = launch { // по потоку на вызов
                     IoC.resolve<Executable>("IoC.Scope.Current.Set", s1).execute()
                     rez = IoC.resolve("сложение", -1, 2, -3, 4)
                     assertEquals(rez, 2)
                 }
+
+                a.join()
+                b.join()
             }
 
+        j.join()
     }
 
 }
