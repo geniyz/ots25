@@ -11,31 +11,33 @@ import kotlin.concurrent.thread
 class EventLoop(
     private val queue: BlockingQueue<Executable>
 ) {
-
     constructor(l: Collection<Executable>): this( LinkedBlockingQueue(l) )
     constructor(): this( emptyList() )
 
-    private lateinit var thread: Thread
-    private val running = atomic(true)
+    var handle: EventLooped = RunEventLoop(this)
     private val defaultTick: ()->Unit = {
-        // println(" in defaultTick $queue ")
-        val command = queue.take()
-        try {
-            command.execute()
-        } catch (e: Throwable) {
-            println("error when command : $command : $e")
-            IoC.resolve<Executable>("HandleException", command, e).execute()
+        val command = queue.first()
+        if(command is EventLoopSpecialCommand){ // это «маркер» особых команд, которые надо выполнять независимо от состояния очереди
+            try {
+                command.execute()
+                take()
+            } catch (e: Throwable) {
+                println("error when command : $command : $e")
+                IoC.resolve<Executable>("HandleException", command, e).execute()
+            }
+        }else{
+            handle.defaultTick()
         }
     }
+
+    private lateinit var thread: Thread
+    private val running = atomic(true)
+
     var tick = atomic(defaultTick)
     var onEnd: ()->Unit = {}
 
-    val size: Int
-        get()= queue.size
-
     val isEmpty: Boolean
         get()= queue.isEmpty()
-    val isNotEmpty: Boolean = !isEmpty
 
     fun start() {
         thread = thread(isDaemon = false) {
@@ -54,5 +56,36 @@ class EventLoop(
 
     fun add(c: List<Executable>)= queue.addAll(c)
     fun add(vararg c: Executable)= queue.addAll(c)
+
+    fun take() = queue.take()
+
+
+    interface EventLooped{
+        val defaultTick: ()->Unit
+    }
+
+    class RunEventLoop(
+        val el: EventLoop,
+    ): EventLooped{
+        override val defaultTick: ()->Unit = {
+            val command = el.take()
+            try {
+                command.execute()
+            } catch (e: Throwable) {
+                println("error when command : $command : $e")
+                IoC.resolve<Executable>("HandleException", command, e).execute()
+            }
+        }
+    }
+
+    class MoveToEventLoop(
+        val el: EventLoop,
+        val dst: BlockingQueue<Executable>,
+    ): EventLooped{
+        override val defaultTick: ()->Unit = {
+            val command = el.take()
+            dst.add(command)
+        }
+    }
 
 }

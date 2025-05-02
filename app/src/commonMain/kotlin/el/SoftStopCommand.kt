@@ -1,10 +1,8 @@
 package site.geniyz.ots.el
 
-import site.geniyz.ots.commands.Executable
-
 class SoftStopCommand(
     private val el: EventLoop
-): Executable {
+): StopCommand(el) {
     override fun execute() {
         val currentTick = el.tick.value
         el.tick.value = {
