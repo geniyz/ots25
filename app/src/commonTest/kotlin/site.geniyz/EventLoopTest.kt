@@ -12,17 +12,17 @@ import site.geniyz.ots.ioc.IoC
 import java.util.concurrent.CountDownLatch
 import kotlin.test.assertEquals
 
-class AccCommand(
-    val ss: UObject,
-    val i2: Int,
-): Executable {
-    override fun execute() {
-        // println(" ${ss["acc"] as Int} += $i2 ")
-        ss["acc"] = (ss["acc"] as Int) + i2
-    }
-}
-
 class EventLoopTest {
+
+    private class AccCommand(
+        val ss: UObject,
+        val i2: Int,
+    ): Executable {
+        override fun execute() {
+            // println(" ${ss["acc"] as Int} += $i2 ")
+            ss["acc"] = (ss["acc"] as Int) + i2
+        }
+    }
 
     @Test
     fun `В цикле получает из потокобезопасной очереди команду и запускает её`() {
